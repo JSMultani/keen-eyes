@@ -1,0 +1,30 @@
+project_type: universal-fixture
+commands:
+  test: "python -m unittest discover -s tests"
+  security_test: "python -m unittest discover -s tests/security"
+  benchmark: "python scripts/generate_artifacts.py"
+artifacts:
+  - name: unit-junit
+    path: reports/junit.xml
+    format: junit
+    category: functional
+    controls: "AC.L1-3.1.1[a]"
+  - name: semgrep-sarif
+    path: reports/semgrep.sarif
+    format: sarif
+    category: security
+    controls: "CM.L2-3.4.1[a]"
+  - name: k6-summary
+    path: reports/k6.json
+    format: k6
+    category: performance
+  - name: osv-results
+    path: reports/osv.json
+    format: osv
+    category: security
+    controls: "SI.L2-3.14.1[a]"
+  - name: cyclonedx-sbom
+    path: reports/bom.json
+    format: cyclonedx
+    category: supply_chain
+    controls: "SI.L2-3.14.1[a]"

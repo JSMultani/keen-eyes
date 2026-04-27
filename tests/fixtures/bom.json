@@ -1,0 +1,15 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    {"type": "library", "name": "demo-lib", "version": "1.0.0"}
+  ],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2099-0001",
+      "description": "Synthetic SBOM vulnerability",
+      "ratings": [{"severity": "high"}]
+    }
+  ]
+}
+

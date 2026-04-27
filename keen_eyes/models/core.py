@@ -22,6 +22,30 @@ class ObjectiveStatus(StrEnum):
 
 
 @dataclass(frozen=True)
+class EvidenceLocation:
+    file: str = ""
+    line: int | None = None
+    column: int | None = None
+
+
+@dataclass(frozen=True)
+class NormalizedEvidence:
+    id: str
+    source: str
+    category: str
+    type: str
+    status: GateStatus
+    severity: str
+    title: str
+    description: str
+    remediation: str = ""
+    location: EvidenceLocation | None = None
+    metrics: dict[str, float] = field(default_factory=dict)
+    raw_artifact: str = ""
+    control_objectives: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class TaskSpec:
     task_id: str
     title: str
@@ -68,6 +92,7 @@ class ValidationResult:
     findings: list[Finding] = field(default_factory=list)
     metrics: dict[str, float] = field(default_factory=dict)
     control_objectives: list[str] = field(default_factory=list)
+    normalized_evidence: list[NormalizedEvidence] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -121,4 +146,3 @@ class RunReport:
 
 def utc_now_iso() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-

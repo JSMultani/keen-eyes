@@ -15,9 +15,30 @@ commands:
 scanners:
   semgrep: "semgrep scan --config auto"
   osv: "osv-scanner ."
+artifacts:
+  - name: unit-tests
+    path: reports/junit.xml
+    format: junit
+    category: functional
+    controls: "AC.L1-3.1.1[a]"
+  - name: semgrep
+    path: reports/semgrep.sarif
+    format: sarif
+    category: security
+    controls: "CM.L2-3.4.1[a]"
 ```
 
 All commands run locally from the project root. Commands under `scanners` are optional. Each scanner command becomes its own normalized validation result and evidence artifact.
+
+Artifacts are optional but recommended. Declared artifacts are parsed by adapters, converted into normalized evidence JSON under `runs/<name>/normalized/`, and then included in the validation report, evidence manifest, and POA&M flow.
+
+## Built-In Artifact Formats
+
+- `junit` or `junit-xml`: unit, integration, and end-to-end test reports
+- `sarif` or `sarif-json`: SAST, IaC, and scanner findings
+- `k6` or `k6-json`: performance summaries
+- `osv` or `osv-json`: dependency vulnerability results
+- `cyclonedx`, `cyclonedx-json`, or `sbom`: SBOM evidence and SBOM vulnerability records
 
 ## Supported Patterns
 

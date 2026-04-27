@@ -1,0 +1,35 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Semgrep",
+          "rules": [
+            {
+              "id": "python.sql-injection",
+              "name": "Possible SQL injection",
+              "help": {"text": "Use parameterized SQL."}
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "python.sql-injection",
+          "level": "error",
+          "message": {"text": "SQL query uses user input."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "app/main.py"},
+                "region": {"startLine": 42, "startColumn": 9}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

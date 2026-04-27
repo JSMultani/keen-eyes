@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import subprocess
 import time
+from dataclasses import asdict, replace
 from pathlib import Path
 
+from keen_eyes.adapters import default_registry
 from keen_eyes.models import Finding, GateStatus, RequirementPlan, ValidationResult
 from keen_eyes.project_profile import ProjectProfile
 from keen_eyes.scanners.dependency import DependencyScanner
@@ -17,6 +19,7 @@ class ValidationEngine:
         self.secret_scanner = SecretScanner()
         self.dependency_scanner = DependencyScanner()
         self.static_scanner = StaticSecurityScanner()
+        self.adapter_registry = default_registry()
 
     def run_all(self, project_path: Path, plan: RequirementPlan, out_dir: Path, profile: ProjectProfile) -> list[ValidationResult]:
         project_path = project_path.resolve()
@@ -29,6 +32,7 @@ class ValidationEngine:
             self.dependency_scanner.scan(project_path, out_dir),
         ]
         results.extend(self.run_profile_scanners(project_path, out_dir, profile))
+        results.extend(self.parse_declared_artifacts(project_path, out_dir, profile))
         return results
 
     def run_tests(self, project_path: Path, out_dir: Path, profile: ProjectProfile) -> ValidationResult:
@@ -258,6 +262,94 @@ class ValidationEngine:
                     artifacts=[str(artifact)],
                     findings=findings,
                     control_objectives=["SI.L2-3.14.1[a]"],
+                )
+            )
+        return results
+
+    def parse_declared_artifacts(self, project_path: Path, out_dir: Path, profile: ProjectProfile) -> list[ValidationResult]:
+        results: list[ValidationResult] = []
+        normalized_dir = out_dir / "normalized"
+        normalized_dir.mkdir(parents=True, exist_ok=True)
+        for declaration in profile.artifacts:
+            artifact_path = (project_path / declaration.path).resolve()
+            if not artifact_path.exists():
+                status = GateStatus.FAIL if declaration.required else GateStatus.WARNING
+                finding = Finding(
+                    id=f"ARTIFACT-{declaration.name.upper()}",
+                    title=f"Declared artifact missing: {declaration.name}",
+                    severity="medium",
+                    status=status,
+                    detail=f"Expected artifact {declaration.path} was not found.",
+                    remediation="Update the project command to generate the artifact or mark it not required.",
+                    control_objectives=declaration.control_objectives,
+                )
+                results.append(
+                    ValidationResult(
+                        id=f"artifact-{declaration.name}",
+                        name=f"Declared artifact: {declaration.name}",
+                        category=declaration.category,
+                        status=status,
+                        summary=f"Missing artifact {declaration.path}",
+                        findings=[finding],
+                        control_objectives=declaration.control_objectives,
+                    )
+                )
+                continue
+            try:
+                normalized = self.adapter_registry.parse(declaration.format, artifact_path, declaration.name, declaration.category)
+            except Exception as exc:
+                finding = Finding(
+                    id=f"ARTIFACT-{declaration.name.upper()}",
+                    title=f"Artifact parse failed: {declaration.name}",
+                    severity="medium",
+                    status=GateStatus.FAIL,
+                    detail=str(exc),
+                    remediation="Check the declared format and artifact contents.",
+                    control_objectives=declaration.control_objectives,
+                )
+                results.append(
+                    ValidationResult(
+                        id=f"artifact-{declaration.name}",
+                        name=f"Declared artifact: {declaration.name}",
+                        category=declaration.category,
+                        status=GateStatus.FAIL,
+                        summary=f"Could not parse {declaration.path}",
+                        artifacts=[str(artifact_path)],
+                        findings=[finding],
+                        control_objectives=declaration.control_objectives,
+                    )
+                )
+                continue
+            normalized = [replace(evidence, control_objectives=evidence.control_objectives or declaration.control_objectives) for evidence in normalized]
+            normalized_path = normalized_dir / f"{declaration.name}.json"
+            normalized_path.write_text(json.dumps([asdict(item) for item in normalized], indent=2), encoding="utf-8")
+            status = GateStatus.FAIL if any(item.status == GateStatus.FAIL for item in normalized) else GateStatus.WARNING if any(
+                item.status == GateStatus.WARNING for item in normalized
+            ) else GateStatus.PASS
+            findings = [
+                Finding(
+                    id=item.id,
+                    title=item.title,
+                    severity=item.severity,
+                    status=item.status,
+                    detail=item.description,
+                    remediation=item.remediation or "Review normalized evidence.",
+                    control_objectives=item.control_objectives or declaration.control_objectives,
+                )
+                for item in normalized
+                if item.status == GateStatus.FAIL
+            ]
+            results.append(
+                ValidationResult(
+                    id=f"artifact-{declaration.name}",
+                    name=f"Parsed artifact: {declaration.name}",
+                    category=declaration.category,
+                    status=status,
+                    summary=f"Parsed {len(normalized)} normalized evidence record(s) from {declaration.format}",
+                    artifacts=[str(artifact_path), str(normalized_path)],
+                    findings=findings,
+                    control_objectives=declaration.control_objectives,
+                    normalized_evidence=normalized,
                 )
             )
         return results

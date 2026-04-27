@@ -55,6 +55,15 @@ class ReportGenerator:
             lines.append("- No failed findings from automated checks.")
         for finding in findings:
             lines.append(f"- {finding.id} `{finding.severity}` {finding.title}: {finding.detail} Remediation: {finding.remediation}")
+        lines.extend(["", "## Normalized Evidence"])
+        normalized_results = [result for result in report.validations if result.normalized_evidence or result.id.startswith("artifact-")]
+        if not normalized_results:
+            lines.append("- No declared artifacts were normalized in this run.")
+        for result in normalized_results:
+            passed = sum(1 for item in result.normalized_evidence if item.status.value == "pass")
+            failed = sum(1 for item in result.normalized_evidence if item.status.value == "fail")
+            warnings = sum(1 for item in result.normalized_evidence if item.status.value == "warning")
+            lines.append(f"- {result.name}: {len(result.normalized_evidence)} record(s), pass={passed}, fail={failed}, warning={warnings}")
         lines.extend(["", "## Compliance Boundary"])
         lines.append("Keen Eyes generated supporting evidence only. Final NIST SP 800-171 assessment requires human judgment.")
         return "\n".join(lines) + "\n"
@@ -105,4 +114,3 @@ class ReportGenerator:
                     }
                 )
         return {"run_id": report.run_id, "items": items}
-

@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "packages": [
+        {
+          "package": {"name": "demo-lib"},
+          "vulnerabilities": [
+            {"id": "OSV-2026-1", "summary": "Synthetic vulnerability"}
+          ]
+        }
+      ]
+    }
+  ]
+}
+

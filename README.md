@@ -101,6 +101,8 @@ Keen Eyes is CLI-first and self-hostable. The core Python package is organized a
 See [docs/architecture.md](docs/architecture.md) for deeper design notes.
 See [docs/project-profiles.md](docs/project-profiles.md) for the universal project adapter format.
 
+The repository also includes `examples/universal_evidence_project`, a tiny fixture project that generates JUnit, SARIF, k6, OSV, and CycloneDX artifacts so you can test the normalized evidence pipeline end to end.
+
 ## Compliance Boundary
 
 Keen Eyes supports evidence generation and objective mapping. It never marks NIST SP 800-171 compliance as complete based only on automation. Objectives can be:

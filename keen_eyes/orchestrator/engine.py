@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 
 from keen_eyes.agents.demo_agent import DeterministicDemoAgent
@@ -27,7 +28,7 @@ class Orchestrator:
             raise ValueError("Task is under-specified: " + "; ".join(plan.under_specified_reasons))
 
         profile = ProjectProfile.load(project_path)
-        (out_dir / "project-profile.json").write_text(json.dumps(profile.__dict__, indent=2), encoding="utf-8")
+        (out_dir / "project-profile.json").write_text(json.dumps(asdict(profile), indent=2), encoding="utf-8")
         trace = self.agent.execute(plan, project_path, out_dir, profile)
         validations = self.validator.run_all(project_path, plan, out_dir, profile)
         store = FileEvidenceStore(out_dir)

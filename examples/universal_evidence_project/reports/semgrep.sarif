@@ -1,0 +1,19 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Semgrep",
+          "rules": [
+            {
+              "id": "demo.warning",
+              "name": "Demo warning"
+            }
+          ]
+        }
+      },
+      "results": []
+    }
+  ]
+}

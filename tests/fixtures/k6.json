@@ -1,0 +1,16 @@
+{
+  "metrics": {
+    "http_req_duration": {
+      "values": {"p(95)": 123.4},
+      "thresholds": {
+        "p(95)<100": {"ok": false}
+      }
+    }
+  },
+  "root_group": {
+    "checks": [
+      {"name": "status is 200", "passes": 10, "fails": 0}
+    ]
+  }
+}
+

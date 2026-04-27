@@ -6,12 +6,23 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
+class ArtifactDeclaration:
+    name: str
+    path: str
+    format: str
+    category: str
+    required: bool = True
+    control_objectives: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class ProjectProfile:
     project_type: str
     test_command: str | None = None
     security_test_command: str | None = None
     benchmark_command: str | None = None
     scanner_commands: dict[str, str] = field(default_factory=dict)
+    artifacts: list[ArtifactDeclaration] = field(default_factory=list)
 
     @classmethod
     def load(cls, project_path: Path) -> "ProjectProfile":
@@ -39,6 +50,7 @@ class ProjectProfile:
             security_test_command=_as_str(commands.get("security_test") or data.get("security_test_command")),
             benchmark_command=_as_str(commands.get("benchmark") or data.get("benchmark_command")),
             scanner_commands={str(key): str(value) for key, value in scanners.items()},
+            artifacts=_artifact_declarations(data.get("artifacts", [])),
         )
 
     @classmethod
@@ -88,6 +100,7 @@ def _as_str(value: object) -> str | None:
 def _parse_small_yaml(text: str) -> dict[str, object]:
     data: dict[str, object] = {}
     current: str | None = None
+    current_list_item: dict[str, object] | None = None
     for raw in text.splitlines():
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
@@ -101,6 +114,23 @@ def _parse_small_yaml(text: str) -> dict[str, object]:
             else:
                 data[key] = {}
                 current = key
+            current_list_item = None
+            continue
+        if current and raw.startswith("  - "):
+            items = data.setdefault(current, [])
+            if not isinstance(items, list):
+                items = []
+                data[current] = items
+            current_list_item = {}
+            items.append(current_list_item)
+            rest = raw.strip()[2:].strip()
+            if ":" in rest:
+                key, value = rest.split(":", 1)
+                current_list_item[key.strip()] = _unquote(value.strip())
+            continue
+        if current_list_item is not None and raw.startswith("    ") and ":" in raw:
+            key, value = raw.split(":", 1)
+            current_list_item[key.strip()] = _unquote(value.strip())
             continue
         if current and raw.startswith("  ") and ":" in raw:
             key, value = raw.split(":", 1)
@@ -114,3 +144,28 @@ def _unquote(value: str) -> str:
     if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
         return value[1:-1]
     return value
+
+
+def _artifact_declarations(value: object) -> list[ArtifactDeclaration]:
+    declarations: list[ArtifactDeclaration] = []
+    if not isinstance(value, list):
+        return declarations
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        controls = item.get("control_objectives", item.get("controls", []))
+        if isinstance(controls, str):
+            controls = [part.strip() for part in controls.split(",") if part.strip()]
+        if not isinstance(controls, list):
+            controls = []
+        declarations.append(
+            ArtifactDeclaration(
+                name=str(item.get("name", item.get("path", "artifact"))),
+                path=str(item.get("path", "")),
+                format=str(item.get("format", "text")).lower(),
+                category=str(item.get("category", "artifact")),
+                required=str(item.get("required", "true")).lower() != "false",
+                control_objectives=[str(control) for control in controls],
+            )
+        )
+    return declarations
