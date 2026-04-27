@@ -28,6 +28,63 @@ The run writes:
 - `runs/sample/ssp-delta.md`
 - `runs/sample/validation-report.md`
 
+## Run Keen Eyes On Your Own Project
+
+Keen Eyes can validate any local project that has a task file and a project profile.
+
+1. Create a task file that describes the change or evaluation target:
+
+```markdown
+# APP-001 Validate My Project
+
+## Functional Requirements
+
+- Users can complete the main workflow.
+- Important business rules are covered by tests.
+
+## Non-Functional Requirements
+
+- Key routes or jobs meet the configured performance budget.
+
+## Security Invariants
+
+- Unauthorized users cannot access protected data.
+- Secrets must not appear in source code or logs.
+- User-controlled input is validated or safely encoded.
+
+## Performance Budgets
+
+- list_documents_p95_ms: 100
+
+## Compliance Tags
+
+- AC.L1-3.1.1
+- AU.L2-3.3.1
+- SI.L2-3.14.1
+- CM.L2-3.4.1
+```
+
+2. Add a `.keen-eyes.yaml` file to the project you want to test:
+
+```yaml
+project_type: custom
+commands:
+  test: "python -m pytest"
+  security_test: "python -m pytest tests/security"
+  benchmark: "python -m pytest tests/performance"
+scanners:
+  semgrep: "semgrep scan --config auto"
+  osv: "osv-scanner ."
+```
+
+3. Run Keen Eyes from this repository:
+
+```powershell
+keen-eyes run --task tasks/my-project.md --project C:\path\to\my-project --out runs/my-project
+```
+
+If your project does not have a `.keen-eyes.yaml`, Keen Eyes tries to infer defaults for Python, Node.js, Go, Rust, Java, .NET, container, and custom projects. Explicit profiles are recommended for repeatable results.
+
 ## Architecture
 
 Keen Eyes is CLI-first and self-hostable. The core Python package is organized around:
