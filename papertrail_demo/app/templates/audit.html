@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+  <h1>Audit Log</h1>
+  <table>
+    <thead><tr><th>ID</th><th>When</th><th>Actor</th><th>Action</th><th>Detail</th></tr></thead>
+    <tbody>
+    {% for event in events %}
+      <tr>
+        <td>{{ event["id"] }}</td>
+        <td>{{ event["created_at"] }}</td>
+        <td>{{ event["actor"] }}</td>
+        <td>{{ event["action"] }}</td>
+        <td>{{ event["detail"]|safe }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+

@@ -1,0 +1,12 @@
+{
+  "users": [
+    {"username": "employee", "password": "employee123", "role": "employee", "display_name": "Emery Employee"},
+    {"username": "reviewer", "password": "reviewer123", "role": "reviewer", "display_name": "Riley Reviewer"},
+    {"username": "admin", "password": "admin123", "role": "admin", "display_name": "Avery Admin"}
+  ],
+  "documents": [
+    {"title": "Travel Policy Draft", "owner": "employee", "filename": "travel-policy.txt", "content": "Synthetic travel policy draft.", "status": "pending"},
+    {"title": "Vendor Review Notes", "owner": "employee", "filename": "vendor-review.txt", "content": "Synthetic vendor notes for demo review.", "status": "approved"}
+  ]
+}
+

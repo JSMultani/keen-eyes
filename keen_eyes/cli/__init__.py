@@ -1,0 +1,2 @@
+"""Keen Eyes CLI."""
+

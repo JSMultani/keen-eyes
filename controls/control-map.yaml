@@ -1,0 +1,35 @@
+controls:
+  AC.L1-3.1.1:
+    title: Limit system access to authorized users.
+    objectives:
+      - id: AC.L1-3.1.1[a]
+        method: test
+        description: Verify unauthorized users cannot access protected resources.
+      - id: AC.L1-3.1.1[b]
+        method: interview
+        description: Confirm account authorization process with system owner.
+  AU.L2-3.3.1:
+    title: Create and retain system audit logs.
+    objectives:
+      - id: AU.L2-3.3.1[a]
+        method: examine
+        description: Examine audit logging configuration and generated audit records.
+      - id: AU.L2-3.3.1[b]
+        method: test
+        description: Verify security-relevant events create audit entries.
+  SI.L2-3.14.1:
+    title: Identify and manage system flaws.
+    objectives:
+      - id: SI.L2-3.14.1[a]
+        method: test
+        description: Verify dependency and vulnerability checks run.
+      - id: SI.L2-3.14.1[b]
+        method: examine
+        description: Examine remediation tracking for unresolved findings.
+  CM.L2-3.4.1:
+    title: Establish and maintain baseline configurations.
+    objectives:
+      - id: CM.L2-3.4.1[a]
+        method: examine
+        description: Examine secure defaults and configuration policy.
+

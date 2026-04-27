@@ -1,0 +1,17 @@
+name: Security
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  builtin-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: keen-eyes run --task tasks/sample-feature.md --project examples/secure_document_workflow --out runs/security
+

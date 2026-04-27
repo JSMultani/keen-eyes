@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+  <h1>{{ document["title"]|safe }}</h1>
+  <p>Owner: {{ document["owner"] }}</p>
+  <p>Filename: {{ document["filename"] }}</p>
+  <p>Status: {{ document["status"] }}</p>
+  <p><a href="/documents/{{ document['id'] }}/download">Download</a></p>
+</section>
+
+{% if user["role"] in ["reviewer", "admin"] %}
+<section class="panel">
+  <h2>Review Decision</h2>
+  <form action="/documents/{{ document['id'] }}/decision" method="post">
+    <select name="decision">
+      <option value="approved">Approve</option>
+      <option value="rejected">Reject</option>
+    </select>
+    <button type="submit">Save decision</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}
+

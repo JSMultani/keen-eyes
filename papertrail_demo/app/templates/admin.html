@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+  <h1>Admin Dashboard</h1>
+  <h2>Users</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Name</th></tr></thead>
+    <tbody>
+    {% for row in users %}
+      <tr><td>{{ row["id"] }}</td><td>{{ row["username"] }}</td><td>{{ row["role"] }}</td><td>{{ row["display_name"] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+<section class="panel">
+  <h2>Documents</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Title</th><th>Owner</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for row in documents %}
+      <tr><td>{{ row["id"] }}</td><td>{{ row["title"] }}</td><td>{{ row["owner"] }}</td><td>{{ row["status"] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+

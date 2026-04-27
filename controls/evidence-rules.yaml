@@ -1,0 +1,23 @@
+rules:
+  - id: functional-tests
+    evidence_type: test_result
+    maps_to:
+      - AC.L1-3.1.1[a]
+      - AU.L2-3.3.1[b]
+  - id: security-tests
+    evidence_type: security_test
+    maps_to:
+      - AC.L1-3.1.1[a]
+  - id: secret-scan
+    evidence_type: scanner_result
+    maps_to:
+      - CM.L2-3.4.1[a]
+  - id: dependency-scan
+    evidence_type: scanner_result
+    maps_to:
+      - SI.L2-3.14.1[a]
+  - id: audit-log-examine
+    evidence_type: artifact
+    maps_to:
+      - AU.L2-3.3.1[a]
+

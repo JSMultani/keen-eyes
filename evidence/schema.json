@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keen-eyes.local/schema/evidence.schema.json",
+  "title": "Keen Eyes Evidence Manifest",
+  "type": "object",
+  "required": ["schema_version", "run_id", "generated_at", "task_id", "artifacts", "control_results"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "run_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "task_id": {"type": "string"},
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "path", "status", "automated", "assessment_methods", "control_objectives"],
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"type": "string"},
+          "path": {"type": "string"},
+          "status": {"type": "string"},
+          "automated": {"type": "boolean"},
+          "assessment_methods": {"type": "array", "items": {"enum": ["examine", "interview", "test"]}},
+          "control_objectives": {"type": "array", "items": {"type": "string"}},
+          "summary": {"type": "string"},
+          "hash_sha256": {"type": "string"}
+        }
+      }
+    },
+    "control_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["objective_id", "status", "assessment_method", "evidence_ids"],
+        "properties": {
+          "objective_id": {"type": "string"},
+          "status": {"enum": ["automated_pass", "automated_fail", "partially_satisfied", "human_review_required", "not_applicable"]},
+          "assessment_method": {"enum": ["examine", "interview", "test"]},
+          "evidence_ids": {"type": "array", "items": {"type": "string"}},
+          "rationale": {"type": "string"}
+        }
+      }
+    }
+  }
+}
+

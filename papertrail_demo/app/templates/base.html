@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PaperTrail Demo</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <strong>PaperTrail Demo</strong>
+    {% if user %}
+    <nav>
+      <span>{{ user["display_name"] }} ({{ user["role"] }})</span>
+      <a href="/documents">Documents</a>
+      <a href="/audit">Audit</a>
+      {% if user["role"] == "admin" %}<a href="/admin">Admin</a>{% endif %}
+      <form action="/logout" method="post" style="display:inline"><button type="submit">Sign out</button></form>
+    </nav>
+    {% endif %}
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
+

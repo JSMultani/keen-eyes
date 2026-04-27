@@ -1,0 +1,19 @@
+name: Evidence Generation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: keen-eyes run --task tasks/sample-feature.md --project examples/secure_document_workflow --out runs/evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keen-eyes-evidence
+          path: runs/evidence

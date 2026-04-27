@@ -1,0 +1,4 @@
+project_type: python-fastapi
+commands:
+  test: "python -m pytest"
+
